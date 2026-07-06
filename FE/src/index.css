@@ -1,0 +1,189 @@
+body {
+  font-family: system-ui, "Apple SD Gothic Neo", sans-serif;
+  background: #f7f7f8;
+  margin: 0;
+}
+
+.app {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+button {
+  padding: 12px 20px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+  font-size: 14px;
+}
+
+th, td {
+  border-bottom: 1px solid #eee;
+  padding: 8px;
+  text-align: left;
+}
+
+.confidence-low {
+  color: #b45309;
+}
+
+.error {
+  color: #dc2626;
+}
+
+.comment {
+  background: #eef2ff;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.comment-loading {
+  color: #6b7280;
+  font-style: italic;
+}
+
+pre {
+  white-space: pre-wrap;
+  background: #f0f0f0;
+  padding: 8px;
+  border-radius: 6px;
+}
+
+.muted {
+  color: #52514e;
+  font-size: 14px;
+}
+
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 320px;
+}
+
+.profile-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  color: #0b0b0b;
+}
+
+.profile-form input,
+.profile-form select {
+  padding: 8px;
+  font-size: 15px;
+  border: 1px solid #c3c2b7;
+  border-radius: 6px;
+}
+
+.daily-summary {
+  margin-bottom: 24px;
+}
+
+.meter-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+}
+
+.meter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: white;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.meter-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #52514e;
+}
+
+.meter-value {
+  font-size: 14px;
+  color: #0b0b0b;
+  font-variant-numeric: tabular-nums;
+}
+
+.meter-track {
+  height: 10px;
+  border-radius: 999px;
+  background: #cde2fb;
+  overflow: hidden;
+}
+
+.meter-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+.meter-fill-normal {
+  background: #2a78d6;
+}
+
+.meter-fill-warning {
+  background: #fab219;
+}
+
+.meter-fill-critical {
+  background: #d03b3b;
+}
+
+.meter-remaining {
+  font-size: 12px;
+  color: #52514e;
+}
+
+.meter-remaining-critical {
+  color: #d03b3b;
+  font-weight: 600;
+}
+
+.meal-card {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.meal-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.remove-item-btn {
+  padding: 2px 8px;
+  font-size: 14px;
+  line-height: 1;
+  border-radius: 4px;
+}
+
+.add-meal-btn {
+  margin-top: 8px;
+}
+
+.add-meal-btn button {
+  width: 100%;
+}

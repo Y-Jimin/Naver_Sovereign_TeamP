@@ -1,0 +1,8 @@
+{
+  "foodNm": "식품명",
+  "enerc": "에너지(kcal)",
+  "chocdf": "탄수화물(g)",
+  "prot": "단백질(g)",
+  "fatce": "지방(g)",
+  "nat": "나트륨(mg)"
+}

@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { UploadReceipt } from "./components/UploadReceipt";
 import { MealCard } from "./components/MealCard";
 import { ProfileForm } from "./components/ProfileForm";
@@ -6,23 +6,24 @@ import { DailySummary } from "./components/DailySummary";
 import { Header } from "./components/Header";
 import { analyzeReceipt, fetchMealComment, NutritionItem } from "./api/client";
 import { Profile, getDailyTarget, sumMealItems, scaledNutrients, MealItem, DEFAULT_GRAMS } from "./nutrition";
-
-interface Meal {
-  id: number;
-  items: MealItem[];
-  comment: string | null;
-  commentLoading: boolean;
-  rawOcrText: string;
-}
+import { Meal, loadProfile, saveProfile, loadMeals, saveMeals } from "./storage";
 
 export default function App() {
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [meals, setMeals] = useState<Meal[]>([]);
+  const [profile, setProfile] = useState<Profile | null>(loadProfile);
+  const [meals, setMeals] = useState<Meal[]>(loadMeals);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const nextId = useRef(0);
+  const nextId = useRef(meals.reduce((max, m) => Math.max(max, m.id + 1), 0));
 
   const consumed = useMemo(() => sumMealItems(meals.flatMap((m) => m.items)), [meals]);
+
+  useEffect(() => {
+    if (profile) saveProfile(profile);
+  }, [profile]);
+
+  useEffect(() => {
+    saveMeals(meals);
+  }, [meals]);
 
   async function handleSelect(file: File) {
     setLoading(true);

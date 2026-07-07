@@ -42,6 +42,23 @@ cp .env.example .env   # VITE_API_BASE_URL 확인
 npm run dev
 ```
 
+## 배포 (NCP 서버)
+
+로컬과 동일하지만 두 가지가 다릅니다: **외부에서 접속 가능하도록 바인딩**, **FE/BE가 서로를 공인 IP로 찾을 수 있도록 설정**.
+
+```bash
+# BE — --host 0.0.0.0 필수 (기본값은 서버 자기 자신만 허용)
+uvicorn app.main:app --host 0.0.0.0 --port 8000
+
+# FE — vite.config.ts에 host: true 반영해둬서 npm run dev만 하면 0.0.0.0으로 바인딩됨
+npm run dev
+```
+
+- ACG(NCP 방화벽)에서 5173, 8000 인바운드 포트를 열어야 함 (이미 완료).
+- `BE/.env`의 `CORS_ORIGINS`에 FE가 실제로 열리는 주소(서버 공인 IP:5173)를 추가해야 함 — 안 하면 브라우저가 API 호출을 CORS로 차단함.
+- `FE/.env`의 `VITE_API_BASE_URL`을 서버 공인 IP:8000으로 설정해야 함 — `localhost`로 두면 브라우저(사용자 PC) 자신을 가리키게 돼서 API 호출이 실패함.
+- 둘 다 `.env.example`에 예시 값과 함께 주석으로 표시해뒀습니다.
+
 ## 남은 TODO (실제 연동 전 확인 필요)
 
 - `CLOVA_OCR_INVOKE_URL`, `CLOVA_STUDIO_CHAT_URL`, `CLOVA_STUDIO_EMBEDDING_URL`은 NCP/CLOVA Studio

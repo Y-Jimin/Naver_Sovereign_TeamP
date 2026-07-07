@@ -1,12 +1,14 @@
 export interface NutritionItem {
   receipt_name: string;
   matched_food: string | null;
+  // 매칭된 음식의 100g(또는 100ml) 기준값. 실제 섭취량(g)에 맞춰 스케일링해서 써야 함.
   calories_kcal: number | null;
   carbs_g: number | null;
   protein_g: number | null;
   fat_g: number | null;
   sodium_mg: number | null;
   confidence: "high" | "medium" | "low";
+  similarity: number | null;
   note: string | null;
 }
 

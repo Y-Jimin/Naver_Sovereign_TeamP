@@ -180,6 +180,26 @@ pre {
   border-radius: 4px;
 }
 
+.grams-input {
+  width: 60px;
+  padding: 4px 6px;
+  border: 1px solid #c3c2b7;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.grams-hint {
+  font-size: 12px;
+  margin-top: 8px;
+}
+
+.comment-btn {
+  width: 100%;
+  margin-top: 12px;
+  background: #eef2ff;
+  border-color: #c7d2fe;
+}
+
 .add-meal-btn {
   margin-top: 8px;
 }

@@ -4,11 +4,11 @@ import { MealCard } from "./components/MealCard";
 import { ProfileForm } from "./components/ProfileForm";
 import { DailySummary } from "./components/DailySummary";
 import { analyzeReceipt, fetchMealComment, NutritionItem } from "./api/client";
-import { Profile, getDailyTarget, sumNutrients } from "./nutrition";
+import { Profile, getDailyTarget, sumMealItems, scaledNutrients, MealItem, DEFAULT_GRAMS } from "./nutrition";
 
 interface Meal {
   id: number;
-  items: NutritionItem[];
+  items: MealItem[];
   comment: string | null;
   commentLoading: boolean;
   rawOcrText: string;
@@ -21,7 +21,7 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const nextId = useRef(0);
 
-  const consumed = useMemo(() => sumNutrients(meals.flatMap((m) => m.items)), [meals]);
+  const consumed = useMemo(() => sumMealItems(meals.flatMap((m) => m.items)), [meals]);
 
   async function handleSelect(file: File) {
     setLoading(true);
@@ -29,23 +29,11 @@ export default function App() {
     try {
       const res = await analyzeReceipt(file);
       const mealId = nextId.current++;
+      const items: MealItem[] = res.items.map((item) => ({ ...item, grams: DEFAULT_GRAMS }));
       setMeals((prev) => [
         ...prev,
-        { id: mealId, items: res.items, comment: null, commentLoading: res.items.length > 0, rawOcrText: res.raw_ocr_text },
+        { id: mealId, items, comment: null, commentLoading: false, rawOcrText: res.raw_ocr_text },
       ]);
-
-      if (res.items.length > 0) {
-        fetchMealComment(res.items)
-          .then((comment) => {
-            setMeals((prev) => prev.map((m) => (m.id === mealId ? { ...m, comment } : m)));
-          })
-          .catch(() => {
-            /* comment is a nice-to-have; silently skip on failure */
-          })
-          .finally(() => {
-            setMeals((prev) => prev.map((m) => (m.id === mealId ? { ...m, commentLoading: false } : m)));
-          });
-      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "알 수 없는 오류가 발생했습니다");
     } finally {
@@ -55,8 +43,50 @@ export default function App() {
 
   function handleRemoveItem(mealId: number, itemIndex: number) {
     setMeals((prev) =>
-      prev.map((m) => (m.id === mealId ? { ...m, items: m.items.filter((_, i) => i !== itemIndex) } : m))
+      prev.map((m) =>
+        m.id === mealId ? { ...m, items: m.items.filter((_, i) => i !== itemIndex), comment: null } : m
+      )
     );
+  }
+
+  function handleGramsChange(mealId: number, itemIndex: number, grams: number) {
+    setMeals((prev) =>
+      prev.map((m) =>
+        m.id === mealId
+          ? { ...m, items: m.items.map((it, i) => (i === itemIndex ? { ...it, grams } : it)), comment: null }
+          : m
+      )
+    );
+  }
+
+  function handleRequestComment(mealId: number) {
+    const meal = meals.find((m) => m.id === mealId);
+    if (!meal || meal.items.length === 0) return;
+
+    // 코멘트는 100g 기준값이 아니라 실제 섭취량(g)으로 스케일된 값을 근거로 만들어야 함.
+    const scaledItems: NutritionItem[] = meal.items.map((item) => {
+      const s = scaledNutrients(item, item.grams);
+      return {
+        ...item,
+        calories_kcal: s.calories,
+        carbs_g: s.carbs,
+        protein_g: s.protein,
+        fat_g: s.fat,
+        sodium_mg: s.sodium,
+      };
+    });
+
+    setMeals((prev) => prev.map((m) => (m.id === mealId ? { ...m, commentLoading: true } : m)));
+    fetchMealComment(scaledItems)
+      .then((comment) => {
+        setMeals((prev) => prev.map((m) => (m.id === mealId ? { ...m, comment } : m)));
+      })
+      .catch((e) => {
+        setError(e instanceof Error ? e.message : "코멘트 생성에 실패했습니다");
+      })
+      .finally(() => {
+        setMeals((prev) => prev.map((m) => (m.id === mealId ? { ...m, commentLoading: false } : m)));
+      });
   }
 
   if (!profile) {
@@ -84,6 +114,8 @@ export default function App() {
           commentLoading={meal.commentLoading}
           rawOcrText={meal.rawOcrText}
           onRemoveItem={(itemIndex) => handleRemoveItem(meal.id, itemIndex)}
+          onGramsChange={(itemIndex, grams) => handleGramsChange(meal.id, itemIndex, grams)}
+          onRequestComment={() => handleRequestComment(meal.id)}
         />
       ))}
 

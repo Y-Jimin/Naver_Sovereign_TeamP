@@ -36,6 +36,7 @@ async def _match_one(name: str) -> NutritionItem:
         fat_g=food.fat_g,
         sodium_mg=food.sodium_mg,
         confidence=confidence,
+        similarity=round(score, 3),
         note=note,
     )
 

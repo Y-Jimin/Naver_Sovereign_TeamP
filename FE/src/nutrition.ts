@@ -15,6 +15,12 @@ export interface NutrientTotals {
   sodium: number;
 }
 
+export const DEFAULT_GRAMS = 100;
+
+export interface MealItem extends NutritionItem {
+  grams: number;
+}
+
 // 2020 한국인 영양소 섭취기준(KDRIs) 에너지 필요추정량을 연령대별로 단순화한 표.
 const CALORIE_TABLE: { maxAge: number; male: number; female: number }[] = [
   { maxAge: 2, male: 1000, female: 1000 },
@@ -51,15 +57,30 @@ export function getDailyTarget({ age, gender }: Profile): NutrientTotals {
   };
 }
 
-export function sumNutrients(items: NutritionItem[]): NutrientTotals {
+// DB 영양값은 전부 100g(또는 100ml) 기준이라, 실제 섭취량(g)에 비례해 스케일링한다.
+export function scaledNutrients(item: NutritionItem, grams: number): NutrientTotals {
+  const factor = grams / 100;
+  return {
+    calories: (item.calories_kcal ?? 0) * factor,
+    carbs: (item.carbs_g ?? 0) * factor,
+    protein: (item.protein_g ?? 0) * factor,
+    fat: (item.fat_g ?? 0) * factor,
+    sodium: (item.sodium_mg ?? 0) * factor,
+  };
+}
+
+export function sumMealItems(items: MealItem[]): NutrientTotals {
   return items.reduce(
-    (acc, item) => ({
-      calories: acc.calories + (item.calories_kcal ?? 0),
-      carbs: acc.carbs + (item.carbs_g ?? 0),
-      protein: acc.protein + (item.protein_g ?? 0),
-      fat: acc.fat + (item.fat_g ?? 0),
-      sodium: acc.sodium + (item.sodium_mg ?? 0),
-    }),
+    (acc, item) => {
+      const s = scaledNutrients(item, item.grams);
+      return {
+        calories: acc.calories + s.calories,
+        carbs: acc.carbs + s.carbs,
+        protein: acc.protein + s.protein,
+        fat: acc.fat + s.fat,
+        sodium: acc.sodium + s.sodium,
+      };
+    },
     { calories: 0, carbs: 0, protein: 0, fat: 0, sodium: 0 }
   );
 }

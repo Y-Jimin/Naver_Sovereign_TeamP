@@ -37,6 +37,7 @@ async def analyze_receipt(image: UploadFile = File(...)) -> AnalyzeResponse:
         raise HTTPException(status_code=400, detail="empty image")
 
     image_format = _detect_image_format(image)
+    print(f"[DEBUG] content_type={image.content_type!r} filename={ascii(image.filename)} format={image_format!r}")
     ocr_text = await ocr_client.run_ocr(image_bytes, image_format=image_format)
     if not ocr_text:
         raise HTTPException(status_code=422, detail="OCR에서 텍스트를 인식하지 못했습니다")

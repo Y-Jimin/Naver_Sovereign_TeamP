@@ -7,9 +7,10 @@ export interface NutritionItem {
   protein_g: number | null;
   fat_g: number | null;
   sodium_mg: number | null;
-  confidence: "high" | "medium" | "low";
+  confidence: "high" | "medium" | "low" | "label";
   similarity: number | null;
   note: string | null;
+  source: "receipt" | "label";
 }
 
 export interface AnalyzeResponse {

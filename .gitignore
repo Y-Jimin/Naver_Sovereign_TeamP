@@ -3,14 +3,12 @@ BE/.venv/
 BE/__pycache__/
 BE/**/__pycache__/
 BE/.env
-BE/data/food_nutrition.csv
-BE/data/food_raw.csv
+#BE/data/food_nutrition.csv
+#BE/data/food_raw.csv
 BE/data/food_processed.csv
-BE/data/food_dishes.csv
-BE/data/food_index.pkl
+#BE/data/food_dishes.csv
+#BE/data/food_index.pkl
 BE/data/food_index.pkl.tmp
-BE/data/전국통합식품영양성분정보표준데이터.csv
-BE/data/전국통합식품영양성분정보_음식_표준데이터.csv
 
 # FE
 FE/node_modules/

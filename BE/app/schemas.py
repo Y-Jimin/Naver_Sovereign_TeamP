@@ -14,6 +14,9 @@ class NutritionItem(BaseModel):
     confidence: str = "low"
     similarity: float | None = None
     note: str | None = None
+    # "receipt": RAG로 매칭됨 (matched_food는 읽기 전용). "label": 영양성분표에서 직접
+    # 추출됨, RAG 매칭 없음 — FE에서 matched_food를 사용자가 입력하는 칸으로 띄워야 함.
+    source: str = "receipt"
 
 
 class AnalyzeResponse(BaseModel):

@@ -4,6 +4,7 @@ const CONFIDENCE_LABEL: Record<string, string> = {
   high: "일치",
   medium: "유사 추정",
   low: "추정 불확실",
+  label: "직접 입력값",
 };
 
 interface Props {
@@ -14,6 +15,7 @@ interface Props {
   rawOcrText: string;
   onRemoveItem: (index: number) => void;
   onGramsChange: (index: number, grams: number) => void;
+  onNameChange: (index: number, name: string) => void;
   onRequestComment: () => void;
 }
 
@@ -29,6 +31,7 @@ export function MealCard({
   rawOcrText,
   onRemoveItem,
   onGramsChange,
+  onNameChange,
   onRequestComment,
 }: Props) {
   const subtotal = items.reduce((sum, item) => sum + scaledNutrients(item, item.grams).calories, 0);
@@ -47,7 +50,7 @@ export function MealCard({
           <thead>
             <tr>
               <th>영수증 품목</th>
-              <th>매칭된 음식</th>
+              <th>음식 이름</th>
               <th>섭취량(g)</th>
               <th>kcal</th>
               <th>탄(g)</th>
@@ -63,8 +66,20 @@ export function MealCard({
               const scaled = scaledNutrients(item, item.grams);
               return (
                 <tr key={i} className={`confidence-${item.confidence}`}>
-                  <td>{item.receipt_name}</td>
-                  <td>{item.matched_food ?? "-"}</td>
+                  <td>{item.source === "label" ? "영양성분표" : item.receipt_name}</td>
+                  <td>
+                    {item.source === "label" ? (
+                      <input
+                        className="name-input"
+                        type="text"
+                        placeholder="음식 이름 입력"
+                        value={item.matched_food ?? ""}
+                        onChange={(e) => onNameChange(i, e.target.value)}
+                      />
+                    ) : (
+                      item.matched_food ?? "-"
+                    )}
+                  </td>
                   <td>
                     <input
                       className="grams-input"

@@ -59,6 +59,16 @@ export default function App() {
     );
   }
 
+  function handleNameChange(mealId: number, itemIndex: number, name: string) {
+    setMeals((prev) =>
+      prev.map((m) =>
+        m.id === mealId
+          ? { ...m, items: m.items.map((it, i) => (i === itemIndex ? { ...it, matched_food: name } : it)) }
+          : m
+      )
+    );
+  }
+
   function handleRequestComment(mealId: number) {
     const meal = meals.find((m) => m.id === mealId);
     if (!meal || meal.items.length === 0) return;
@@ -92,7 +102,7 @@ export default function App() {
   if (!profile) {
     return (
       <main className="app">
-        <h1>영수증 영양성분 분석</h1>
+        <h1>스냅밀[Snap Meal]</h1>
         <ProfileForm onSubmit={setProfile} />
       </main>
     );
@@ -115,6 +125,7 @@ export default function App() {
           rawOcrText={meal.rawOcrText}
           onRemoveItem={(itemIndex) => handleRemoveItem(meal.id, itemIndex)}
           onGramsChange={(itemIndex, grams) => handleGramsChange(meal.id, itemIndex, grams)}
+          onNameChange={(itemIndex, name) => handleNameChange(meal.id, itemIndex, name)}
           onRequestComment={() => handleRequestComment(meal.id)}
         />
       ))}

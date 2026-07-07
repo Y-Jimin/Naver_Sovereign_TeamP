@@ -3,6 +3,7 @@ import { UploadReceipt } from "./components/UploadReceipt";
 import { MealCard } from "./components/MealCard";
 import { ProfileForm } from "./components/ProfileForm";
 import { DailySummary } from "./components/DailySummary";
+import { Header } from "./components/Header";
 import { analyzeReceipt, fetchMealComment, NutritionItem } from "./api/client";
 import { Profile, getDailyTarget, sumMealItems, scaledNutrients, MealItem, DEFAULT_GRAMS } from "./nutrition";
 
@@ -101,8 +102,8 @@ export default function App() {
 
   if (!profile) {
     return (
-      <main className="app">
-        <h1>스냅밀[Snap Meal]</h1>
+      <main className="app app-onboarding">
+        <Header />
         <ProfileForm onSubmit={setProfile} />
       </main>
     );
@@ -112,7 +113,7 @@ export default function App() {
 
   return (
     <main className="app">
-      <h1>영수증 영양성분 분석</h1>
+      <Header />
       <DailySummary target={target} consumed={consumed} />
 
       {meals.map((meal, i) => (

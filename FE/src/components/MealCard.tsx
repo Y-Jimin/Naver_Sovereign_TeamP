@@ -1,4 +1,5 @@
 import { MealItem, scaledNutrients } from "../nutrition";
+import { Spinner } from "./Spinner";
 
 const CONFIDENCE_LABEL: Record<string, string> = {
   high: "일치",
@@ -46,72 +47,76 @@ export function MealCard({
       {items.length === 0 ? (
         <p className="muted">모든 품목이 삭제되었습니다.</p>
       ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>영수증 품목</th>
-              <th>음식 이름</th>
-              <th>섭취량(g)</th>
-              <th>kcal</th>
-              <th>탄(g)</th>
-              <th>단(g)</th>
-              <th>지(g)</th>
-              <th>나트륨(mg)</th>
-              <th>매칭 정확도</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item, i) => {
-              const scaled = scaledNutrients(item, item.grams);
-              return (
-                <tr key={i} className={`confidence-${item.confidence}`}>
-                  <td>{item.source === "label" ? "영양성분표" : item.receipt_name}</td>
-                  <td>
-                    {item.source === "label" ? (
+        <div className="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>영수증 품목</th>
+                <th>음식 이름</th>
+                <th>섭취량(g)</th>
+                <th>kcal</th>
+                <th>탄(g)</th>
+                <th>단(g)</th>
+                <th>지(g)</th>
+                <th>나트륨(mg)</th>
+                <th>정확도</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.map((item, i) => {
+                const scaled = scaledNutrients(item, item.grams);
+                return (
+                  <tr key={i}>
+                    <td>{item.source === "label" ? "영양성분표" : item.receipt_name}</td>
+                    <td>
+                      {item.source === "label" ? (
+                        <input
+                          className="name-input"
+                          type="text"
+                          placeholder="음식 이름 입력"
+                          value={item.matched_food ?? ""}
+                          onChange={(e) => onNameChange(i, e.target.value)}
+                        />
+                      ) : (
+                        item.matched_food ?? "-"
+                      )}
+                    </td>
+                    <td>
                       <input
-                        className="name-input"
-                        type="text"
-                        placeholder="음식 이름 입력"
-                        value={item.matched_food ?? ""}
-                        onChange={(e) => onNameChange(i, e.target.value)}
+                        className="grams-input"
+                        type="number"
+                        min={0}
+                        value={item.grams}
+                        onChange={(e) => onGramsChange(i, Number(e.target.value))}
                       />
-                    ) : (
-                      item.matched_food ?? "-"
-                    )}
-                  </td>
-                  <td>
-                    <input
-                      className="grams-input"
-                      type="number"
-                      min={0}
-                      value={item.grams}
-                      onChange={(e) => onGramsChange(i, Number(e.target.value))}
-                    />
-                  </td>
-                  <td>{item.calories_kcal != null ? fmt(scaled.calories) : "-"}</td>
-                  <td>{item.carbs_g != null ? fmt(scaled.carbs) : "-"}</td>
-                  <td>{item.protein_g != null ? fmt(scaled.protein) : "-"}</td>
-                  <td>{item.fat_g != null ? fmt(scaled.fat) : "-"}</td>
-                  <td>{item.sodium_mg != null ? fmt(scaled.sodium) : "-"}</td>
-                  <td title={item.note ?? undefined}>
-                    {CONFIDENCE_LABEL[item.confidence]}
-                    {item.similarity != null && ` (${Math.round(item.similarity * 100)}%)`}
-                  </td>
-                  <td>
-                    <button
-                      className="remove-item-btn"
-                      title="이 품목 삭제 (내가 먹은 게 아님)"
-                      onClick={() => onRemoveItem(i)}
-                    >
-                      −
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                    </td>
+                    <td>{item.calories_kcal != null ? fmt(scaled.calories) : "-"}</td>
+                    <td>{item.carbs_g != null ? fmt(scaled.carbs) : "-"}</td>
+                    <td>{item.protein_g != null ? fmt(scaled.protein) : "-"}</td>
+                    <td>{item.fat_g != null ? fmt(scaled.fat) : "-"}</td>
+                    <td>{item.sodium_mg != null ? fmt(scaled.sodium) : "-"}</td>
+                    <td title={item.note ?? undefined}>
+                      <span className={`badge badge-${item.confidence}`}>
+                        {CONFIDENCE_LABEL[item.confidence]}
+                        {item.similarity != null && ` ${Math.round(item.similarity * 100)}%`}
+                      </span>
+                    </td>
+                    <td>
+                      <button
+                        className="remove-item-btn"
+                        title="이 품목 삭제 (내가 먹은 게 아님)"
+                        onClick={() => onRemoveItem(i)}
+                      >
+                        −
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       )}
 
       {items.length > 0 && (
@@ -120,7 +125,11 @@ export function MealCard({
         </p>
       )}
 
-      {commentLoading && <p className="comment comment-loading">코멘트 생성 중...</p>}
+      {commentLoading && (
+        <p className="comment comment-loading">
+          <Spinner size={14} className="spinner-ai" /> 코멘트 생성 중...
+        </p>
+      )}
       {!commentLoading && comment && <p className="comment">{comment}</p>}
       {!commentLoading && !comment && items.length > 0 && (
         <button className="comment-btn" onClick={onRequestComment}>

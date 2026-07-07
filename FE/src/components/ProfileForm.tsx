@@ -38,7 +38,9 @@ export function ProfileForm({ onSubmit }: Props) {
           <option value="female">여성</option>
         </select>
       </label>
-      <button type="submit">시작하기</button>
+      <button type="submit" className="btn-primary">
+        시작하기
+      </button>
     </form>
   );
 }

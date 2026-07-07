@@ -1,4 +1,5 @@
 import { ChangeEvent, useRef } from "react";
+import { Spinner } from "./Spinner";
 
 interface Props {
   onSelect: (file: File) => void;
@@ -28,7 +29,13 @@ export function UploadReceipt({ onSelect, disabled, className, label }: Props) {
         hidden
       />
       <button onClick={() => inputRef.current?.click()} disabled={disabled}>
-        {disabled ? "분석 중..." : label ?? "영수증 촬영/업로드"}
+        {disabled ? (
+          <span className="btn-loading">
+            <Spinner size={14} /> 분석 중...
+          </span>
+        ) : (
+          label ?? "영수증 촬영/업로드"
+        )}
       </button>
     </div>
   );
